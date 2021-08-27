@@ -4,6 +4,7 @@ import { validateRequestQuery } from '../../config/baseFunction';
 const excel = require("node-excel-export");
 import moment from "moment"
 import * as modelConsumer from "../dashboard/consumerData/model"
+import * as modelRegistration from "../dashboard/registration/model"
 import * as modelDemographic from "../dashboard/demographic/model"
 import * as modelWinner from "../winner/model"
 
@@ -151,6 +152,80 @@ export const exportConsumerData = async (req: Request, res: Response, next: Next
             },
         ]);
         res.attachment(`${moment().format("DD-MM-YYYY")}_listConsumer.xlsx`);
+        res.send(report);
+
+    } catch (error) {
+        next(error)
+    }
+};
+
+export const exportRegistration = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const subtract = validateRequestQuery(req.query.subtract, "num") == 1 ? 1 : 0
+        const key: string = validateRequestQuery(req.query.key, "numCharSpace");
+        const column: string = validateRequestQuery(req.query.column, "any");
+        const direction = validateRequestQuery(
+            req.query.direction,
+            "char"
+        ).toUpperCase();
+        const startDate: any = validateRequestQuery(req.query.startDate, "any");
+        const endDate: any = validateRequestQuery(req.query.endDate, "any");
+        const media: any = validateRequestQuery(req.query.media, "any");
+        // const region = validateRequestQuery(req.query.region, "num")
+
+        let param = {
+            startDate: startDate,
+            endDate: endDate,
+            key: key,
+            column: column,
+            direction: direction,
+            limitQuery: "",
+            media: media,
+            subtract: subtract,
+            // region: region
+        };
+
+        let response: any = await modelRegistration.exportRegistration(param);
+        let obejctDefine: any
+        if (response.length < 1) {
+            obejctDefine = []
+        } else {
+            obejctDefine = Object.keys(response[0])
+        }
+        const styles = {
+            headerDark: {
+                fill: {
+                    fgColor: {
+                        rgb: "FFFFFF",
+                    },
+                },
+                font: {
+                    color: {
+                        rgb: "000000",
+                    },
+                    sz: 14,
+                    bold: true,
+                    underline: true,
+                    textAlign: "center",
+                },
+            },
+        };
+        let specification: any = {};
+        for (let index = 0; index < obejctDefine.length; index++) {
+            specification[`${obejctDefine[index]}`] = {
+                displayName: obejctDefine[index],
+                headerStyle: styles.headerDark,
+                width: 30
+            }
+        }
+        const report = excel.buildExport([
+            {
+                name: "Report",
+                specification: specification,
+                data: response,
+            },
+        ]);
+        res.attachment(`${moment().format("DD-MM-YYYY")}_listRegistration.xlsx`);
         res.send(report);
 
     } catch (error) {

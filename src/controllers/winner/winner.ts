@@ -41,36 +41,36 @@ export const listWinner = async (req: Request, res: Response, next: NextFunction
             status: status,
             userId
         };
-        // let countWinner: any = await model.countWinnerV2(params);
-        // result.countWinner = countWinner;
+        let countWinner: any = await model.countWinnerV2(params);
+        result.countWinner = countWinner;
 
-        // let totalWinner = countWinner[0].counts;
-        // let paginations: any = await pagination(page, dataPerPage, totalWinner);
-        // let nextPage =
-        //     paginations.currentPage == paginations.totalPage
-        //         ? null
-        //         : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage + 1
-        //         }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
-        // let prevPage =
-        //     paginations.currentPage == 1
-        //         ? null
-        //         : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage - 1
-        //         }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
+        let totalWinner = countWinner[0].counts;
+        let paginations: any = await pagination(page, dataPerPage, totalWinner);
+        let nextPage =
+            paginations.currentPage == paginations.totalPage
+                ? null
+                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage + 1
+                }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
+        let prevPage =
+            paginations.currentPage == 1
+                ? null
+                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage - 1
+                }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
 
-        // params.limitQuery = paginations.query
+        params.limitQuery = paginations.query
         let list_winner: any = await model.listWinnerV2(params, "maxCountingTopup");
         result.listWinner = list_winner;
 
-        // const data = {
-        //     dataPerPage: paginations.dataPerPage,
-        //     currentPage: paginations.currentPage,
-        //     totalData: paginations.totalData,
-        //     totalPage: paginations.totalPage,
-        //     nextPage: nextPage,
-        //     prevPage: prevPage,
-        //     data: list_winner,
-        // }
-        return responseHandle(req, res, "Success to get data", "listWinner", list_winner, 200)
+        const data = {
+            dataPerPage: paginations.dataPerPage,
+            currentPage: paginations.currentPage,
+            totalData: paginations.totalData,
+            totalPage: paginations.totalPage,
+            nextPage: nextPage,
+            prevPage: prevPage,
+            data: list_winner,
+        }
+        return responseHandle(req, res, "Success to get data", "listWinner", data, 200)
     } catch (err) {
         next(err)
     }

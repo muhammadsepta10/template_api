@@ -16,7 +16,7 @@ export const list = async (req: Request, res: Response, next: NextFunction) => {
 export const summary = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = await model.summdaryData()
-        let tempPrize = ["pls5rb", "pls10rb", "lm5gr", "ut100Jt"]
+        let tempPrize = ["pls10rb"]
         let fixData: any = []
         let dateTemp = ""
         let dataObj: any = {}

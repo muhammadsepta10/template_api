@@ -64,11 +64,9 @@ export const countConsumerData = (params: Type) => {
     SELECT count(*) as counts,
 sum(consumer.totalValid) as totalValid,
 sum(consumer.totalInvalid) as totalInvalid,
-sum(consumer.totalPending) as totalPending,
-sum(totalValid+totalInvalid+totalPending) as total
+sum(totalValid+totalInvalid) as total
 from(SELECT SUM(CASE WHEN entries.is_valid = 1 THEN 1 ELSE 0 END) AS totalValid,
-    SUM(CASE WHEN entries.is_valid = 0 THEN 1 ELSE 0 END) AS totalInvalid,
-    SUM(CASE WHEN entries.is_valid IS NULL THEN 1 ELSE 0 END) AS totalPending
+    SUM(CASE WHEN entries.is_valid = 0 THEN 1 ELSE 0 END) AS totalInvalid
     FROM entries
     JOIN profiles ON entries.profile_id = profiles.id
     WHERE entries.is_deleted = 0 ${keyWhere(
@@ -88,7 +86,6 @@ export const listConsumerData = (params: Type) => {
            regency AS city,
            SUM(CASE WHEN entries.is_valid = 1 THEN 1 ELSE 0 END) AS total_submit_valid,
            SUM(CASE WHEN entries.is_valid = 0 THEN 1 ELSE 0 END) AS total_submit_invalid,
-           SUM(CASE WHEN entries.is_valid IS NULL THEN 1 ELSE 0 END) AS total_submit_pending,
            COUNT(*) AS total_submit
     FROM entries
     JOIN profiles ON entries.profile_id = profiles.id
@@ -110,7 +107,6 @@ export const exportConsumer = (params: Type) => {
            regency AS city,
            SUM(CASE WHEN entries.is_valid = 1 THEN 1 ELSE 0 END) AS total_submit_valid,
            SUM(CASE WHEN entries.is_valid = 0 THEN 1 ELSE 0 END) AS total_submit_invalid,
-           SUM(CASE WHEN entries.is_valid IS NULL THEN 1 ELSE 0 END) AS total_submit_pending,
            COUNT(*) AS total_submit
     FROM entries
     JOIN profiles ON entries.profile_id = profiles.id

@@ -40,8 +40,8 @@ const time = (condition: number, column: any) => {
             break;
         case condition == 4:
             return column !== ""
-                ? `DATE_FORMAT(${column}.rcvd_time,'%H') AS DATE,`
-                : `DATE_FORMAT(rcvd_time,'%H') AS DATE,`;
+                ? `DATE_FORMAT(${column}.rcvd_time,'%H:00:00') AS DATE,`
+                : `DATE_FORMAT(rcvd_time,'%H:00:00') AS DATE,`;
             break;
     }
 };
@@ -393,16 +393,15 @@ export const statusSummary = (params: Type) => {
 export const statusSummaryV2 = (params: Type) => {
     const statusSummaryQuery = `SELECT
     ${time(params.condition, "")}
-    SUM(CASE WHEN reply.sort = 1 THEN 1 ELSE 0 END) AS wrongFormat,
-    SUM(CASE WHEN reply.sort = 2 THEN 1 ELSE 0 END) AS wrongKTP,
-    SUM(CASE WHEN reply.sort = 6 THEN 1 ELSE 0 END) AS underAge,
-    SUM(CASE WHEN reply.sort = 7 THEN 1 ELSE 0 END) AS notYetStart,
-    SUM(CASE WHEN reply.sort = 8 THEN 1 ELSE 0 END) AS overProgram,
-    SUM(CASE WHEN reply.sort = 9 THEN 1 ELSE 0 END) AS wrongCoupon,
-    SUM(CASE WHEN reply.sort = 10 THEN 1 ELSE 0 END) AS duplicateCoupon,
-    SUM(CASE WHEN reply.sort = 11 THEN 1 ELSE 0 END) AS overLimit,
-    SUM(CASE WHEN reply.sort = 12 THEN 1 ELSE 0 END) AS unlucky,
-    SUM(CASE WHEN reply.sort = 4 THEN 1 ELSE 0 END) AS blacklist,
+    SUM(CASE WHEN reply.id = 1 THEN 1 ELSE 0 END) AS wrongFormat,
+    SUM(CASE WHEN reply.id = 3 THEN 1 ELSE 0 END) AS wrongKTP,
+    SUM(CASE WHEN reply.id = 4 THEN 1 ELSE 0 END) AS underAge,
+    SUM(CASE WHEN reply.id = 5 THEN 1 ELSE 0 END) AS wrongCoupon,
+    SUM(CASE WHEN reply.id = 6 THEN 1 ELSE 0 END) AS duplicateCoupon,
+    SUM(CASE WHEN reply.id = 625 THEN 1 ELSE 0 END) AS differentFromPrev,
+    SUM(CASE WHEN reply.id = 454 OR reply.id = 8 THEN 1 ELSE 0 END) AS notYetStart,
+    SUM(CASE WHEN reply.id = 457 OR reply.id = 9 THEN 1 ELSE 0 END) AS overProgram,
+    SUM(CASE WHEN reply.id = 218 THEN 1 ELSE 0 END) AS blacklist,
     SUM(CASE WHEN is_valid = 1 THEN 1 ELSE 0 END) AS valid,
     SUM(CASE WHEN is_valid = 0 THEN 1 ELSE 0 END) AS invalid,
     SUM(CASE WHEN is_valid = 2 THEN 1 ELSE 0 END) AS pending,
@@ -526,17 +525,17 @@ export const summaryEntries = (param: Type, isTrue: boolean) => {
         }
     } else {
         return query(`SELECT
-        valid_wa_1,
-        invalid_wa_1,
-        valid_wa_2,
-        invalid_wa_2,
-        valid_wa_3,
-        invalid_wa_3,
-        valid_microsite,
-        invalid_microsite,
-        valid,
-        invalid,
-        total,
+        sum(valid_wa_1) valid_wa_1,
+        sum(invalid_wa_1) invalid_wa_1,
+        sum(valid_wa_2) valid_wa_2,
+        sum(invalid_wa_2) invalid_wa_2,
+        sum(valid_wa_3) valid_wa_3,
+        sum(invalid_wa_3) invalid_wa_3,
+        sum(valid_microsite) valid_microsite,
+        sum(invalid_microsite) invalid_microsite,
+        sum(valid) valid,
+        sum(invalid) invalid,
+        sum(total) total,
         label FROM (
         SELECT
                         valid_wa_1,

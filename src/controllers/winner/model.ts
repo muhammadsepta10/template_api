@@ -168,7 +168,6 @@ export const exportWinner = (params: Type) => {
            transactions.sn serial_number
     FROM winners
     JOIN entries ON winners.entries_id = entries.id
-    JOIN allocations ON winners.allocation_id = allocations.id
     JOIN prizes ON winners.prize_id = prizes.id
     LEFT JOIN transactions ON winners.id = transactions.winner_id AND transactions.sn IS NOT NULL AND transactions.sn != ""
     WHERE entries.is_deleted = 0

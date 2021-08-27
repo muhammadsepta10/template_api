@@ -58,7 +58,6 @@ export const listConsumerData = async (req: Request, res: Response, next: NextFu
         const data = {
             dataPerPage: paginations.dataPerPage,
             totalValid: parseInt(result.countConsumer[0].totalValid),
-            totalPending: parseInt(result.countConsumer[0].totalPending),
             totalInvalid: parseInt(result.countConsumer[0].totalInvalid),
             total: parseInt(result.countConsumer[0].total),
             currentPage: paginations.currentPage,

@@ -713,8 +713,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
             let overProgramSeries = 0
             let wrongCouponSeries = 0
             let duplicateCouponSeries = 0
-            let overLimitSeries = 0
-            let unluckySeries = 0
+            let differentFromPrevSeries = 0
             let blacklistSeries = 0
             let categoriesReason = [
                 "Format Salah",
@@ -724,9 +723,8 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                 "Program Belum Dimulai",
                 "Program Berakhir",
                 "Kode Unik Salah",
-                "Melebihi Batas",
-                "Belum Beruntung",
-                "Blacklist",
+                "Sender & KTP tidak sesuai dengan sebelumnya",
+                "Blacklist"
             ];
             let categoriesValidInvalid = ["Valid", "Invalid"];
 
@@ -748,8 +746,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                 const overProgram = validateRequestQuery(response[index].overProgram, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].overProgram, "num"))
                 const wrongCoupon = validateRequestQuery(response[index].wrongCoupon, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].wrongCoupon, "num"))
                 const duplicateCoupon = validateRequestQuery(response[index].duplicateCoupon, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].duplicateCoupon, "num"))
-                const overLimit = validateRequestQuery(response[index].overLimit, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].overLimit, "num"))
-                const unlucky = validateRequestQuery(response[index].unlucky, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].unlucky, "num"))
+                const differentFromPrev = validateRequestQuery(response[index].differentFromPrev, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].differentFromPrev, "num"))
                 const blacklist = validateRequestQuery(response[index].blacklist, "num") == "" ? 0 : parseInt(validateRequestQuery(response[index].blacklist, "num"))
                 wrongFormatSeries += wrongFormat
                 wrongKTPSeries += wrongKTP
@@ -758,8 +755,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                 overProgramSeries += overProgram
                 wrongCouponSeries += wrongCoupon
                 duplicateCouponSeries += duplicateCoupon
-                overLimitSeries += overLimit
-                unluckySeries += unlucky
+                differentFromPrevSeries += differentFromPrev
                 blacklistSeries += blacklist
                 validSeries += valid
                 invalidSeries += invalid
@@ -781,8 +777,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                 notYetStartSeries,
                 overProgramSeries,
                 wrongCouponSeries,
-                overLimitSeries,
-                unluckySeries,
+                differentFromPrevSeries,
                 blacklistSeries
             ]
 
@@ -809,8 +804,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                     overProgram: overProgramSeries,
                     wrongCoupon: wrongCouponSeries,
                     duplicateCoupon: duplicateCouponSeries,
-                    overLimit: overLimitSeries,
-                    unlucky: unluckySeries,
+                    differentFromPrev: differentFromPrevSeries,
                     blacklist: blacklistSeries,
                     invalid: invalidSeries,
                     validWa1: validWa1Series,
@@ -845,8 +839,7 @@ export const statusSummaryV2 = async (req: Request, res: Response, next: NextFun
                         overProgram: overProgramSeries,
                         wrongCoupon: wrongCouponSeries,
                         duplicateCoupon: duplicateCouponSeries,
-                        overLimit: overLimitSeries,
-                        unlucky: unluckySeries,
+                        differentFromPrev: differentFromPrevSeries,
                         blacklist: blacklistSeries,
                         valid: validSeries,
                         invalid: invalidSeries,
@@ -1027,6 +1020,7 @@ export const profileSummaryV2 = async (req: Request, res: Response, next: NextFu
                     total: 0
                 }
                 for (let index = 0; index < res.length; index++) {
+                    if(res[index].label !== null){
                     const label = conditionCode == 1 ? moment(res[index].label).format("DD MMM YYYY") :
                         conditionCode == 2 ? weekRange(res[index].label) :
                             conditionCode == 3 ? moment(res[index].label).format("MMM YYYY") : moment(res[index].label, "H").format("HH:mm:ss")
@@ -1056,12 +1050,13 @@ export const profileSummaryV2 = async (req: Request, res: Response, next: NextFu
                 }
                 fixData.push(returnVallue)
                 return fixData
-            })
+            }})
 
             return res.send({
                 message: "Success", data: {
                     data,
-                    series, categories,
+                    series, 
+                    categories,
                     totalProfile
                 }
             })
