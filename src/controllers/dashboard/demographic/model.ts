@@ -77,7 +77,7 @@ export const countDistribution = (params: Type) => {
       COUNT(*) AS total_submit,
       CASE WHEN uniqueConsumen.counts > 0 THEN uniqueConsumen.counts ELSE 0 END AS totalUnik
       FROM entries
-      JOIN profiles ON entries.profile_id = profiles.id
+      LEFT JOIN profiles ON entries.profile_id = profiles.id
       LEFT JOIN (SELECT profiles.regency, COUNT(*) AS counts 
       FROM profiles WHERE id IN (SELECT profile_id FROM entries) GROUP BY profiles.regency) AS uniqueConsumen 
       ON profiles.regency = uniqueConsumen.regency
@@ -97,7 +97,7 @@ export const exportDistribution = (params: Type) => {
   SUM(CASE WHEN entries.is_valid=0 AND media = "300" THEN 1 ELSE 0 END) AS total_submit_invalidWa,
   uniqueConsumen.counts as uniqueConsumen 
   FROM entries
-  JOIN profiles ON entries.profile_id = profiles.id
+  LEFT JOIN profiles ON entries.profile_id = profiles.id
   LEFT JOIN (SELECT profiles.regency, COUNT(*) AS counts 
   FROM profiles GROUP BY profiles.regency) AS uniqueConsumen ON profiles.regency = uniqueConsumen.regency
   WHERE entries.is_deleted = 0${keyWhere(params.key)}${mediaWhere(params.media)} GROUP BY profiles.regency${orderBy(params.direction, params.column)} ${params.limitQuery}`;
@@ -112,7 +112,7 @@ export const listDistribution = (params: Type) => {
   SUM(CASE WHEN entries.is_valid=0 THEN 1 ELSE 0 END) AS total_submit_invalid,
   uniqueConsumen.counts as uniqueConsumen 
   FROM entries
-  JOIN profiles ON entries.profile_id = profiles.id
+  LEFT JOIN profiles ON entries.profile_id = profiles.id
   LEFT JOIN (SELECT profiles.regency, COUNT(*) AS counts 
   FROM profiles GROUP BY profiles.regency) AS uniqueConsumen ON profiles.regency = uniqueConsumen.regency
   WHERE entries.is_deleted = 0${keyWhere(params.key)}${mediaWhere(params.media)} GROUP BY profiles.regency${orderBy(params.direction, params.column)} ${params.limitQuery}`;
@@ -134,7 +134,7 @@ FROM (SELECT
           COUNT(*) AS total_submit,
           CASE WHEN uniqueConsumen.counts > 0 THEN uniqueConsumen.counts ELSE 0 END AS totalUnik
   FROM entries
-  JOIN profiles ON entries.profile_id = profiles.id
+  LEFT JOIN profiles ON entries.profile_id = profiles.id
   LEFT JOIN (SELECT profiles.regency_ktp, COUNT(*) AS counts 
   FROM profiles WHERE id IN (SELECT profile_id FROM entries) 
     GROUP BY profiles.regency_ktp
@@ -158,7 +158,7 @@ export const listDistributionKtp = (params: Type) => {
         SUM(CASE WHEN entries.is_valid=0 AND media = "300" THEN 1 ELSE 0 END) AS total_submit_invalidWa,
         uniqueConsumen.counts as uniqueConsumen 
     FROM entries
-    JOIN profiles ON entries.profile_id = profiles.id
+    LEFT JOIN profiles ON entries.profile_id = profiles.id
     LEFT JOIN (SELECT profiles.regency_ktp, COUNT(*) AS counts 
                FROM profiles 
                GROUP BY regency_ktp
