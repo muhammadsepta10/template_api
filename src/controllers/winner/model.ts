@@ -123,7 +123,7 @@ export const countWinnerV3 = (params: Type) => {
     JOIN (SELECT entries.*,
                  header_id 
           FROM entries,coupon_detail 
-          WHERE entries.id = coupon_detail.entrties_id 
+          WHERE entries.id = coupon_detail.entries_id 
           GROUP BY coupon_detail.header_id) 
          entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id WHERE entries.is_deleted = 0 ${keyWhere(params.key, params.columnSearch)}${typeWhere(params.type)}${statusWhere(params.status)}${dateWhere(params.startDate, params.endDate)}`;
@@ -152,7 +152,7 @@ export const listWinnerV3 = (params: Type, gnrlParameter: string) => {
     JOIN (SELECT entries.*,
                  header_id 
           FROM entries,coupon_detail 
-          WHERE entries.id = coupon_detail.entrties_id 
+          WHERE entries.id = coupon_detail.entries_id 
           GROUP BY coupon_detail.header_id) 
          entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id 
@@ -251,7 +251,7 @@ export const exportWinnerV2 = (params: Type) => {
     JOIN (SELECT entries.*,
                 header_id 
             FROM entries,coupon_detail 
-            WHERE entries.id = coupon_detail.entrties_id 
+            WHERE entries.id = coupon_detail.entries_id 
             GROUP BY coupon_detail.header_id) 
     entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id
@@ -283,7 +283,7 @@ export const detailWinnerV2 = (id: number) => {
     JOIN (SELECT entries.*,
                 header_id 
           FROM entries,coupon_detail 
-          WHERE entries.id = coupon_detail.entrties_id 
+          WHERE entries.id = coupon_detail.entries_id 
           GROUP BY coupon_detail.header_id) 
     entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id
