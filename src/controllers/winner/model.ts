@@ -269,11 +269,11 @@ export const exportWinnerV2 = (params: Type) => {
 export const detailWinnerV2 = (id: number) => {
     let queryDetailwinner = `
     SELECT winners.id,
-           profiles.name fullname,
-           profiles.sender,
-           profiles.hp,
-           profiles.id_number,
-           profiles.rcvd_time,
+           entries.name fullname,
+           entries.sender,
+           entries.hp,
+           entries.id_number,
+           entries.rcvd_time,
            prizes.name prize,
            winners.status,
            winners.account_number,
