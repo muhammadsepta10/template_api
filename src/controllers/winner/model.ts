@@ -116,6 +116,57 @@ export const countWinnerV2 = (params: Type) => {
     return query(queryCountWinner, "");
 };
 
+export const countWinnerV3 = (params: Type) => {
+    let queryCountWinner = `SELECT COUNT(*) as counts   
+    FROM winners
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                 header_id 
+          FROM entries,coupon_detail 
+          WHERE entries.id = coupon_detail.entrties_id 
+          GROUP BY coupon_detail.header_id) 
+         entries ON coupon_header.id = entries.header_id
+    JOIN prizes ON winners.prize_id = prizes.id WHERE entries.is_deleted = 0 ${keyWhere(params.key, params.columnSearch)}${typeWhere(params.type)}${statusWhere(params.status)}${dateWhere(params.startDate, params.endDate)}`;
+    return query(queryCountWinner, "");
+};
+
+export const listWinnerV3 = (params: Type, gnrlParameter: string) => {
+    let queryListWinner = `
+    SELECT winners.id,
+           winners.entries_id,
+           entries.sender,
+           entries.name,
+           entries.hp,
+           entries.id_number,
+           prizes.name AS prizeName,
+           entries.rcvd_time,
+           winners.status,
+           entries.city,
+           winners.status,
+           prizes.type,
+           winners.account_number,
+           winners.counting,
+           (SELECT param FROM general_parameter WHERE description = ?) maxCount
+    FROM winners
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                 header_id 
+          FROM entries,coupon_detail 
+          WHERE entries.id = coupon_detail.entrties_id 
+          GROUP BY coupon_detail.header_id) 
+         entries ON coupon_header.id = entries.header_id
+    JOIN prizes ON winners.prize_id = prizes.id 
+    WHERE entries.is_deleted = 0
+    ${params?.userId?"AND topup_by !="+params.userId:""}
+    ${keyWhere(params.key, params.columnSearch)}
+    ${typeWhere(params.type)}
+    ${statusWhere(params.status)}
+    ${dateWhere(params.startDate, params.endDate)} 
+    ${orderBy(params.direction, params.column)} 
+    ${params.limitQuery}`;
+    return query(queryListWinner, gnrlParameter);
+};
+
 export const listWinnerV2 = (params: Type, gnrlParameter: string) => {
     let queryListWinner = `
     SELECT winners.id,
@@ -188,6 +239,34 @@ export const detailWinner = (id: number) => {
            profiles.hp,
            profiles.id_number,
            profiles.rcvd_time,
+           prizes.name prize,
+           winners.status,
+           winners.account_number,
+           transactions.sn
+    FROM winners
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                header_id 
+          FROM entries,coupon_detail 
+          WHERE entries.id = coupon_detail.entrties_id 
+          GROUP BY coupon_detail.header_id) 
+    entries ON coupon_header.id = entries.header_id
+    JOIN prizes ON winners.prize_id = prizes.id
+    LEFT JOIN transactions ON winners.id = transactions.winner_id AND transactions.sn IS NOT NULL AND transactions.sn != ""
+    WHERE entries.is_deleted = 0
+    AND winners.id = ?
+    GROUP BY winners.id`;
+    return query(queryDetailwinner, id);
+};
+
+export const detailWinnerV2 = (id: number) => {
+    let queryDetailwinner = `
+    SELECT winners.id,
+           entries.name fullname,
+           entries.sender,
+           entries.hp,
+           entries.id_number,
+           entries.rcvd_time,
            prizes.name prize,
            winners.status,
            winners.account_number,

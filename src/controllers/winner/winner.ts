@@ -91,6 +91,89 @@ export const detailWinner = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+export const listWinner2 = async (req: Request, res: Response, next: NextFunction) => {
+    let apiUrl: string = `/api/v1/winner`;
+    let result: any = {};
+    const dataPerPage: number =
+        validateRequestQuery(req.query.row, "numChar") == ""
+            ? 10
+            : validateRequestQuery(req.query.row, "num");
+    const key: string = validateRequestQuery(req.query.key, "numCharSpace");
+    const page: number = validateRequestQuery(req.query.page, "num");
+    const column: string = validateRequestQuery(req.query.order, "any");
+    const columnSearch: string = validateRequestQuery(req.query.columnSearch, "any");
+    const direction = validateRequestQuery(
+        req.query.orderCondition,
+        "char"
+    ).toUpperCase();
+    const type = validateRequestQuery(req.query.type, "num")
+    const status = validateRequestQuery(req.query.status, "num")
+    const startDate = validateRequestQuery(req.query.startDate, "any")
+    const endDate = validateRequestQuery(req.query.endDate, "any")
+    const userId = res.locals.id.id
+    try {
+        let params = {
+            startDate: startDate,
+            endDate: endDate,
+            key: key,
+            column: column,
+            columnSearch: columnSearch,
+            direction: direction,
+            limitQuery: "",
+            type: type,
+            status: status,
+            userId
+        };
+        let countWinner: any = await model.countWinnerV3(params);
+        result.countWinner = countWinner;
+
+        let totalWinner = countWinner[0].counts;
+        let paginations: any = await pagination(page, dataPerPage, totalWinner);
+        let nextPage =
+            paginations.currentPage == paginations.totalPage
+                ? null
+                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage + 1
+                }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
+        let prevPage =
+            paginations.currentPage == 1
+                ? null
+                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage - 1
+                }&key=${key}&column=${column}&columnSearch=${columnSearch}&direction=${direction}&type=${type}`;
+
+        params.limitQuery = paginations.query
+        let list_winner: any = await model.listWinnerV3(params, "maxCountingTopup");
+        result.listWinner = list_winner;
+
+        const data = {
+            dataPerPage: paginations.dataPerPage,
+            currentPage: paginations.currentPage,
+            totalData: paginations.totalData,
+            totalPage: paginations.totalPage,
+            nextPage: nextPage,
+            prevPage: prevPage,
+            data: list_winner,
+        }
+        return responseHandle(req, res, "Success to get data", "listWinner", data, 200)
+    } catch (err) {
+        next(err)
+    }
+};
+
+export const detailWinner2 = async (req: Request, res: Response, next: NextFunction) => {
+    let id: number = validateRequestQuery(req.params.id, "num");
+    try {
+        let winner: any = await model.detailWinnerV2(id);
+        const transactions = await model.transactionByWiner(id);
+        if (winner?.length > 0) {
+            return responseHandle(req, res, "Success to get data", "detailEntries", { data: winner[0], transaction: transactions }, 200)
+        } else {
+            return errorHandle(req, res, "Data Not Found", "detailEntries", [], 400)
+        }
+    } catch (err) {
+        next(err)
+    }
+};
+
 
 // export const updateWinner = async (req: Request, res: Response, next: NextFunction) => {
 //     let status = req.body.status

@@ -195,6 +195,7 @@ let router = express.Router();
  *                                      type: object
  */
 router.route("/").get(winner.listWinner);
+router.route("/list/v2").get(winner.listWinner2);
 
 /**
  * @swagger
@@ -253,6 +254,7 @@ router.route("/").get(winner.listWinner);
  *                                      type: object
  */
 router.route("/:id").get(winner.detailWinner);
+router.route("/detail/v2/:id").get(winner.detailWinner2);
 
 /**
  * @swagger
