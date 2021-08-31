@@ -334,7 +334,7 @@ export const exportWinner = async (req: Request, res: Response, next: NextFuncti
             media,
             prizeId
         };
-        let response: any = await modelWinner.exportWinner(params);
+        let response: any = await modelWinner.exportWinnerV2(params);
         let obejctDefine: any
         if (response.length < 1) {
             obejctDefine = []

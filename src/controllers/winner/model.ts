@@ -231,7 +231,42 @@ export const exportWinner = (params: Type) => {
     return query(queryListWinner, "");
 };
 
-export const detailWinner = (id: number) => {
+export const exportWinnerV2 = (params: Type) => {
+    let queryListWinner = `
+    SELECT winners.id,
+           winners.entries_id,
+           entries.sender,
+           entries.name,
+           entries.hp,
+           entries.id_number,
+           prizes.name AS prizeName,
+           DATE_FORMAT(entries.rcvd_time,"%Y-%m-%d %H:%i:s") rcvd_time,
+           entries.invalid_reason info,
+           (CASE WHEN winners.status = 0 THEN "Unprocessed" WHEN winners.status = 1 THEN "Processed" WHEN winners.status = 2 THEN "Success" WHEN winners.status = 3 THEN "Failed" ELSE 0 END) status,
+           entries.city, (CASE WHEN prizes.type = 1 THEN "Hadiah Hiburan" WHEN prizes.type = 2 THEN "Grand Prize" ELSE 0 END) type,
+           winners.account_number,
+           transactions.sn serial_number
+    FROM winners
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                header_id 
+            FROM entries,coupon_detail 
+            WHERE entries.id = coupon_detail.entrties_id 
+            GROUP BY coupon_detail.header_id) 
+    entries ON coupon_header.id = entries.header_id
+    JOIN prizes ON winners.prize_id = prizes.id
+    LEFT JOIN transactions ON winners.id = transactions.winner_id AND transactions.sn IS NOT NULL AND transactions.sn != ""
+    WHERE entries.is_deleted = 0
+    ${keyWhere(params.key, params.columnSearch)}
+    ${typeWhere(params.type)}
+    ${statusWhere(params.status)}
+    ${dateWhere(params.startDate, params.endDate)}
+    GROUP BY winners.id
+    ${orderBy(params.direction, params.column)}`;
+    return query(queryListWinner, "");
+};
+
+export const detailWinnerV2 = (id: number) => {
     let queryDetailwinner = `
     SELECT winners.id,
            profiles.name fullname,
@@ -259,7 +294,7 @@ export const detailWinner = (id: number) => {
     return query(queryDetailwinner, id);
 };
 
-export const detailWinnerV2 = (id: number) => {
+export const detailWinner = (id: number) => {
     let queryDetailwinner = `
     SELECT winners.id,
            entries.name fullname,
