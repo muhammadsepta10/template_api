@@ -80,10 +80,16 @@ const checkParam = (date: string) => {
 export const countPrizePulsa = (params: Type) => {
     let queryCountPP = `SELECT COUNT(*) as counts
     FROM winners
-    JOIN entries ON winners.entries_id = entries.id
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                header_id 
+            FROM entries,coupon_detail 
+            WHERE entries.id = coupon_detail.entries_id 
+            GROUP BY coupon_detail.header_id) 
+    entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id
+    LEFT JOIN transactions ON winners.id = transactions.winner_id AND transactions.sn IS NOT NULL AND transactions.sn != ""
     WHERE entries.is_deleted = 0
-    AND prizes.type = 1
     ${keyWhere(params.key)}
     ${mediaWhere(params.media)}
     ${statusWhere(params.status)}
@@ -104,10 +110,16 @@ export const listPrizePulsa = (params: Type) => {
     prizes.type,
     winners.status
     FROM winners
-    JOIN entries ON winners.entries_id = entries.id
+    JOIN coupon_header ON winners.entries_id = coupon_header.id
+    JOIN (SELECT entries.*,
+                header_id 
+            FROM entries,coupon_detail 
+            WHERE entries.id = coupon_detail.entries_id 
+            GROUP BY coupon_detail.header_id) 
+    entries ON coupon_header.id = entries.header_id
     JOIN prizes ON winners.prize_id = prizes.id
+    LEFT JOIN transactions ON winners.id = transactions.winner_id AND transactions.sn IS NOT NULL AND transactions.sn != ""
     WHERE entries.is_deleted = 0
-    AND prizes.type = 1
     ${keyWhere(params.key)}
     ${mediaWhere(params.media)}
     ${statusWhere(params.status)}
