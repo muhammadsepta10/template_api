@@ -5,7 +5,6 @@ let bcrypt = require("bcryptjs");
 let salt = bcrypt.genSaltSync(10);
 
 export const userList = async (req: Request, res: Response, next: NextFunction) => {
-    let apiUrl: string = `/api/v1/dashboard/entries`;
     const domainUrl = req.protocol + '://' + req.headers.host + "/"
     let result: any = {};
 
@@ -37,12 +36,12 @@ export const userList = async (req: Request, res: Response, next: NextFunction) 
         let nextPage =
             paginations.currentPage == paginations.totalPage
                 ? null
-                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage + 1
+                : `?dataPerPage=${dataPerPage}&page=${paginations.currentPage + 1
                 }&key=${key}&order=${column}&orderCondition=${direction}`;
         let prevPage =
             paginations.currentPage == 1
                 ? null
-                : `${apiUrl}?dataPerPage=${dataPerPage}&page=${paginations.currentPage - 1
+                : `?dataPerPage=${dataPerPage}&page=${paginations.currentPage - 1
                 }&key=${key}&order=${column}&orderCondition=${direction}`;
         params.limitQuery = paginations.query
 
